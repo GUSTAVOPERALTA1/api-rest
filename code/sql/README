@@ -1,0 +1,14 @@
+# Crear base de datos SQLite
+ sqlite3 clientes.sqlite < clientes.sql
+
+# Entrar a sqlite3 
+sqlite3 clientes.sqlite
+
+# Commands sqlite
+.show 
+.schema
+.table
+.mode   Columns|List|CSV
+.header ON|OFF
+.read archive.sql
+-quit salir
