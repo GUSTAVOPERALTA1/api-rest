@@ -5,6 +5,7 @@ email VARCHAR(50) NOT NULL);
 
 INSERT INTO clientes(nombre,email) VALUES("Gustavo","gustavo@email.com");
 INSERT INTO clientes(nombre,email) VALUES("Maria","maria@email.com");
+INSERT INTO clientes(nombre,email) VALUES("Fatima","fatima@email.com");
 
 .headers ON 
 SELECT * FROM clientes;
