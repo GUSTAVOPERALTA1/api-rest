@@ -16,7 +16,7 @@ app = FastAPI()
 
 @app.get("/", response_model=Respuesta)
 async def index():
-    return{"message":"API-REST"}
+    return{"message": "API-REST"}
     
 @app.get("/clientes/", response_model=List[Cliente])
 async def clientes():
