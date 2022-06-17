@@ -18,12 +18,13 @@ app = FastAPI()
 async def index():
     return{"message": "API-REST"}
     
+#Metodo get con limit y offset    
 @app.get("/clientes/", response_model=List[Cliente])
-async def clientes():
+async def get_clientes(offset:int=0,limit:int=5):
     with sqlite3.connect('sql/clientes.sqlite') as connection:
         connection.row_factory = sqlite3.Row
         cursor = connection.cursor()
-        cursor.execute("SELECT * FROM clientes")
+        cursor.execute("SELECT * FROM clientes LIMIT ? OFFSET ?",(limit,offset))
         response = cursor.fetchall()
         return response
 
