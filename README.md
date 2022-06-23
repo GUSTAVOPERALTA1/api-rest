@@ -17,3 +17,8 @@ docker run -it -v /workspace/api-rest/apitest/:/home/apitest --name test -h gust
 git fetch
 git pull
 ´´´
+# cambiar configuracion de git
+´´´
+git pull --rebase origin main
+git push -u origin main
+´´´
