@@ -15,3 +15,5 @@ INSERT INTO clientes(nombre,email) VALUES("Lupita","lupita@email.com");
 INSERT INTO clientes(nombre,email) VALUES("Carmen","carmen@email.com");
 .headers ON 
 SELECT * FROM clientes;
+
+

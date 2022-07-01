@@ -9,16 +9,11 @@ def test_index():
     assert response.status_code == 200
     assert response.json() == data
 
-def test_list():
-    response = clientes.get('/clientes/1')
-    data = [{"id_cliente":1,"nombre":"Saul","email":"saul@gmail.com"}]
-    assert response.status_code == 200
-    assert response.json() == data
 
-def test_offset():
-    response = clientes.get('/clientes/?offeset=1&limit=3')
-    data = [{"id_cliente":1,"nombre":"Saul","email":"saul@gmail.com"},
+def test_limit():
+	response = clientes.get('/clientes/offset=0&limit=3')
+	data = [{"id_cliente":1,"nombre":"Saul","email":"saul@gmail.com"},
 	{"id_cliente":2,"nombre":"Maria","email":"maria@gmail.com"},
 	{"id_cliente":3,"nombre":"Fatima","email":"fatima@gmail.com"}]
-    assert response.status_code == 200
-    assert response.json()==data
+	assert response.status_code == 200
+	assert response.json()==data

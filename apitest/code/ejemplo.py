@@ -1,17 +1,17 @@
-import hashlib   # importa la libreria hashlib
-import sqlite3  # Conecta con la base de datos
-import os  # Permite trabajar con rutas independientemente del sistema operativo
-from typing import List  # Generar las listas de items
+import hashlib  # importa la libreria hashlib
+import sqlite3
+import os
+from typing import List
 
 from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi.security import HTTPBasic, HTTPBasicCredentials  # Protocolo para identificar usuarios, basica
-from pydantic import BaseModel 
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from pydantic import BaseModel
 
-app = FastAPI()  # Creacion de objeto
+app = FastAPI()
 
-DATABASE_URL = os.path.join("backend/sql/proyecto.db")  # Ruta del sqlite
+DATABASE_URL = os.path.join("backend/sql/proyecto.db")
 
-security = HTTPBasic()  # Permite preguntar usuario y contraseña
+security = HTTPBasic()
 
 """
 DROP TABLE IF EXISTS usuarios;
@@ -37,15 +37,15 @@ class Usuarios(BaseModel):
 
 
 def get_current_level(credentials: HTTPBasicCredentials = Depends(security)):
-    password_b = hashlib.md5(credentials.password.encode())  # Convierte a bits
-    password = password_b.hexdigest()  # convierte a hexadecimal
+    password_b = hashlib.md5(credentials.password.encode())
+    password = password_b.hexdigest()
     with sqlite3.connect(DATABASE_URL) as connection:
         cursor = connection.cursor()
         cursor.execute(
             "SELECT level FROM usuarios WHERE username = ? and password = ?",
             (credentials.username, password),
         )
-        user = cursor.fetchone()  # Recibe valor de 0 o 1 si el usuario existe
+        user = cursor.fetchone()
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -54,14 +54,14 @@ def get_current_level(credentials: HTTPBasicCredentials = Depends(security)):
             )
     return user[0]
 
-@app.get( #  Donde me conecto
+@app.get(
     "/usuarios/",
     response_model=List[Usuarios],
     status_code=status.HTTP_202_ACCEPTED,
-    summary="Regresa una lista de usuarios",  # Dar informacion del endpoint
+    summary="Regresa una lista de usuarios",
     description="Regresa una lista de usuarios",
 )
-async def get_usuarios(level: int = Depends(get_current_level)):  #Compara lo pedido en el login
+async def get_usuarios(level: int = Depends(get_current_level)):
     if level == 0:  # Administrador
         with sqlite3.connect(DATABASE_URL) as connection:
             connection.row_factory = sqlite3.Row
