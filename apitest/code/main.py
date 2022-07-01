@@ -9,11 +9,8 @@ from pydantic import BaseModel
 
 app = FastAPI()  # Creacion de objeto
 
-<<<<<<< HEAD
-DATABASE_URL = os.path.join("/workspace/api-rest/apitest/code/sql/usuarios.sqlite")  # Ruta del sqlite
-=======
+ # Ruta del sqlite
 DATABASE_URL = os.path.join("sql/usuarios.sqlite")  # Ruta del sqlite
->>>>>>> 2ac3389 (Funcionando VS)
 
 security = HTTPBasic()  # Permite preguntar usuario y contraseña
 
@@ -119,17 +116,6 @@ async def get_usuarios(offset:int=0,limit:int=11, level: int = Depends(get_curre
     summary="Inserta nuevo cliente",
     description="Inserta nuevo cliente")
 async def post_clientes(nombre:str,email:str, level: int = Depends(get_current_level)):
-<<<<<<< HEAD
-    if level == 0:
-     with sqlite3.connect('sql/clientes.sqlite') as connection:
-		    connection.row_factory = sqlite3.Row
-		    cursor = connection.cursor()
-		    cursor.execute('INSERT INTO clientes (nombre,email) VALUES (?,?)',(nombre,email))
-		    cursor.fetchall()
-		    return {"mensaje":"Cliente agregado"}
-    else:
-        raise HTTPException(
-=======
 	if level == 0:
 		with sqlite3.connect('sql/clientes.sqlite') as connection:
 			connection.row_factory = sqlite3.Row
@@ -139,7 +125,6 @@ async def post_clientes(nombre:str,email:str, level: int = Depends(get_current_l
 			return {"mensaje":"Cliente agregado"}
 	else:
 		raise HTTPException(
->>>>>>> 2ac3389 (Funcionando VS)
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Don't have permission to access this resource",
             headers={"WWW-Authenticate": "Basic"},
