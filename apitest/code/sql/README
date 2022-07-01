@@ -12,3 +12,9 @@ sqlite3 clientes.sqlite
 .header ON|OFF
 .read archive.sql
 -quit salir
+
+# Commands
+´´´
+.schema
+.read usuarios.sql
+.schema

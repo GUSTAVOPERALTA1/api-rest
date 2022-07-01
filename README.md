@@ -22,3 +22,8 @@ git pull
 git pull --rebase origin main
 git push -u origin main
 ´´´
+
+# Comando para correr uvicorn en VISUAL STUDIO CODE
+´´´
+python3 -m uvicorn main:app --reload
+´´´
