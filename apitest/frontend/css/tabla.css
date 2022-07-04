@@ -1,0 +1,35 @@
+h1{
+    margin: 10px auto;
+    text-align: center;
+}
+body{
+    background-color:rgb(196, 242, 245);
+}
+#main_container{
+    margin: 90px auto;
+    width: 600px;
+}
+table{
+    background-color: rgb(229, 245, 244);
+    width: 100%;
+    text-align: left;
+}
+
+th{
+    border: solid 2px darkcyan;
+    padding: 0.7%;
+    font-family: Arial;
+    color: white;
+}
+td{
+    border: solid 0.3px gray;
+    padding: 0.8%; 
+}
+thead{
+    background-color:rgb(2, 118, 118);
+    border-bottom: solid 5px;
+    color: gold;
+}
+tr:nth-child(even){
+    background-color: white;
+}

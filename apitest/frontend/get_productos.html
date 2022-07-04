@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang= "es">
+    <header>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" 
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="/css/tabla.css">
+        <title>DOM JavaScript</title>
+    </header>
+    <body>
+        <h1>Clientes</h1>
+        <div id="main_container">
+            <table id = "tabla_clientes">
+                <thead id = "thead_clientes">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody_clientes">
+                </tbody>
+            </table>
+
+
+            <script src="/static/js/get_productos.js"></script> 
+            <script>
+                document.body.onload = getProductos();
+            </script>
+        </div>
+    </body>
+</html>

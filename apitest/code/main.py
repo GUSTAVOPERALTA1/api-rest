@@ -3,11 +3,25 @@ import sqlite3  # Conecta con la base de datos
 import os  # Permite trabajar con rutas independientemente del sistema operativo
 from typing import List  # Generar las listas de items
 
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, status, Depends
 from fastapi.security import HTTPBasic, HTTPBasicCredentials  # Protocolo para identificar usuarios, basica
 from pydantic import BaseModel 
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()  # Creacion de objeto
+    
+origins = [  # Puertos Permitidos
+    "http://127.0.0.1:8080",
+    "http://127.0.0.1:8000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"], # Metodos permitidos
+    allow_headers=["*"],
+)
 
  # Ruta del sqlite
 DATABASE_URL = os.path.join("sql/usuarios.sqlite")  # Ruta del sqlite
@@ -95,7 +109,7 @@ async def get_usuarios(id_cliente,level: int = Depends(get_current_level)):  #Co
     summary="Regresa una lista de clientes",
     description="Regresa una lista de usuarios",
     response_model=List[Cliente])
-async def get_usuarios(offset:int=0,limit:int=11, level: int = Depends(get_current_level)): 
+async def get_usuarios(offset:int=0,limit:int=14, level: int = Depends(get_current_level)): 
     if level == 0:
         with sqlite3.connect('sql/clientes.sqlite') as connection:
             connection.row_factory = sqlite3.Row
@@ -140,9 +154,9 @@ async def put_clientes(id:str, nombre:str, email:str, level: int = Depends(get_c
         with sqlite3.connect('sql/clientes.sqlite') as connection:
                 connection.row_factory = sqlite3.Row
                 cursor = connection.cursor()
-                cursor.execute('INSERT INTO clientes (nombre,email) VALUES (?,?)',(nombre,email))
+                cursor.execute('UPDATE clientes SET nombre = ?, email = ? WHERE id_cliente = ?',(nombre,email,id))
                 cursor.fetchall()
-                return {"mensaje":"Cliente agregado"}
+                return {"mensaje":"Cliente actualizado"}
     else:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
