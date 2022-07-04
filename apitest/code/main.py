@@ -24,6 +24,12 @@ app.add_middleware(
 )
 
  # Ruta del sqlite
+from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.security import HTTPBasic, HTTPBasicCredentials  # Protocolo para identificar usuarios, basica
+from pydantic import BaseModel 
+
+app = FastAPI()  # Creacion de objeto
+
 DATABASE_URL = os.path.join("sql/usuarios.sqlite")  # Ruta del sqlite
 
 security = HTTPBasic()  # Permite preguntar usuario y contraseña
@@ -109,7 +115,7 @@ async def get_usuarios(id_cliente,level: int = Depends(get_current_level)):  #Co
     summary="Regresa una lista de clientes",
     description="Regresa una lista de usuarios",
     response_model=List[Cliente])
-async def get_usuarios(offset:int=0,limit:int=14, level: int = Depends(get_current_level)): 
+async def get_usuarios(offset:int=0,limit:int=11, level: int = Depends(get_current_level)): 
     if level == 0:
         with sqlite3.connect('sql/clientes.sqlite') as connection:
             connection.row_factory = sqlite3.Row

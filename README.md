@@ -27,8 +27,6 @@ git push -u origin main
 ´´´
 python3 -m uvicorn main:app --reload
 ´´´
-
 # Forzar commit a GITHUB
 ´´´
 git push -u origin main --force
-´´´
