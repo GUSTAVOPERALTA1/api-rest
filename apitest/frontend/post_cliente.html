@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+    <header>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" 
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="/static/css/tabla.css">
+        <title>DOM JavaScript</title>
+    </header>
+    <body>
+        <h1>Insertar Cliente</h1>
+        <form id="form_cliente">
+            <label for="nombre">Nombre</label>
+            <br>
+            <input type="text" id="nombre" name="nombre" />
+            <br>
+            <label for="email">Email</label>
+            <br>
+            <input type="text" id="email" name="email" />
+            <br>
+            <input type="button" value="Guardar" onclick="postCliente()"/>
+        </form>
+        <script type="text/javascript" src="js/post_cliente.js"></script>
+    </body>
+</html>

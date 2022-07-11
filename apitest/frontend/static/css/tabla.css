@@ -6,7 +6,7 @@ body{
     background-color:rgb(196, 242, 245);
 }
 #main_container{
-    margin: 90px auto;
+    margin: 30px auto;
     width: 600px;
 }
 table{
@@ -33,3 +33,21 @@ thead{
 tr:nth-child(even){
     background-color: white;
 }
+
+.button {
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    background-color:rgb(2, 118, 118);
+    margin: 10px;
+  }
+  #button_container{
+    margin: 10px auto;
+    width: 10%;
+}
+

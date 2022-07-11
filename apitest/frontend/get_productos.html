@@ -4,7 +4,7 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" 
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
         <meta charset="UTF-8">
-        <link rel="stylesheet" href="/css/tabla.css">
+        <link rel="stylesheet" href="/static/css/tabla.css">
         <title>DOM JavaScript</title>
     </header>
     <body>
@@ -16,17 +16,21 @@
                         <th>ID</th>
                         <th>Nombre</th>
                         <th>Email</th>
+                        <th>Acciones</th>
+                        <th>Actualizar</th>
+                        <th>Eliminar</th>
                     </tr>
                 </thead>
                 <tbody id="tbody_clientes">
                 </tbody>
             </table>
-
-
-            <script src="/static/js/get_productos.js"></script> 
+            <script src="js/get_productos.js"></script> 
             <script>
                 document.body.onload = getProductos();
             </script>
+        </div>
+        <div id="button_container">
+            <a href="post_cliente.html"><input type="button" class="button" value="Nuevo"></a>
         </div>
     </body>
 </html>
