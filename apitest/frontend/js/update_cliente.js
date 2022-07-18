@@ -1,15 +1,26 @@
-function deleteCliente(){
+function putCliente(){
 
     var request = new XMLHttpRequest();
     var id_cliente = window.location.search.substring(1);
+    let id_clientecap = id_cliente;
+    let nombre = document.getElementById("nombre");
+    let email  = document.getElementById("email");
+
+    let payload = {
+        "id_cliente": id_clientecap,
+        "nombre": nombre.value,
+        "email" : email.value,
+    }
+
     console.log("id_cliente: " + id_cliente);
+    console.log("nombre: " + nombre.value);
+    console.log("email: "  + email.value);
+    console.log(payload);
     
-    request.open('DELETE', "http://127.0.0.1:8000/clientes/"+ id_cliente,true);
+    request.open('PUT', "http://127.0.0.1:8000/clientes/",true);
     request.setRequestHeader("Accept", "application/json");
-    request.setRequestHeader("Authorization", "Basic " + btoa(usernombre + ":" + password))
     request.setRequestHeader("content-type", "application/json");
 
-    
     request.onload = () => {
         
         const response = request.responseText;
@@ -30,5 +41,5 @@ function deleteCliente(){
             window.location.replace("get_list.html")
         }
     };
-    request.send();
+    request.send(JSON.stringify(payload));
 }
