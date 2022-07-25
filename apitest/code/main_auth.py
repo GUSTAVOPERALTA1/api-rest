@@ -1,9 +1,31 @@
 from fastapi import *
 from fastapi.security import *
+from pydantic import BaseModel
 import pyrebase
-
+from fastapi.security import HTTPBasic, HTTPBasicCredentials 
+from fastapi.middleware.cors import CORSMiddleware
+from typing import Union
 app = FastAPI()
 
+origins = [  # Puertos Permitidos
+    "http://127.0.0.1:8080",
+    "http://127.0.0.1:8000",
+    ]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins= origins,
+    allow_credentials=True,
+    allow_methods=["*"], # Metodos permitidos
+    allow_headers=["*"],
+)
+
+class Usuario(BaseModel):
+    email: str
+    password: str
+
+class Respuesta(BaseModel):
+    message: str
 
 @app.get('/',
 summary="Api-Rest")
@@ -64,6 +86,29 @@ async def get_user(credentials: HTTPAuthorizationCredentials = Depends(securityB
             'user_data': user_data
         }
         return response
+    except Exception as error:
+        print(f"Error: {error}")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
+@app.post("/user/",
+    status_code= status.HTTP_202_ACCEPTED,
+    summary="Insertar usuario",
+    description="Insertar usuarios dentro de Firebase Realtime",
+    tags=["add"])
+async def insert_user(post_user: Usuario):
+    try: 
+        email = post_user.email
+        password = post_user.password
+        auth = firebase.auth()
+        datos = {
+            'email' : email,
+            'nivel' : 1,
+            'nombre' : 'user'
+        }
+        crear = auth.create_user_with_email_and_password(email, password)
+        db = firebase.database()
+        db.child("users").child(crear["localId"]).set(datos)
+        return {"message": "Cliente agregado"}
     except Exception as error:
         print(f"Error: {error}")
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
