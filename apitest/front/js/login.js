@@ -14,7 +14,7 @@ function Login(){
         
         if(status == 202){
             getInformation(json.token);
-            window.location.replace("/index.html");
+            window.location.replace("/bienvenida.html");
         }
         else{
             alert(json.detail);
