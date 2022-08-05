@@ -1,10 +1,25 @@
 <!DOCTYPE html>
-<html lang= "es">
+<html lang="es">
     <header>
-        <title>DOM JavaScript</title>
+        
+        <meta charset="UTF-8">
+        <title>Login</title>
     </header>
     <body>
-        <h1>Clientes</h1>
-        <a href="/get_list.html">Get productos</a>
-    </body>
+        <h1>LOGIN</h1>
+        <form method="GET" name="form_usuario">
+            <label for="email">Email</label>
+            <br>
+            <input type="text" id="email" name="correo" />
+            <br>
+            <label for="password">Contraseña</label>
+            <br>
+            <input type="password" id="pword" name="password" />
+            <br>
+            <br>
+            <input type="button" value="Ingresar" onclick="Login()"/>
+            <script type="text/javascript" defer src="js/login.js"></script>
+            <br>     
+        </form>
+        </body>
 </html>
