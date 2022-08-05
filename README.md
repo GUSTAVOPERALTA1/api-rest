@@ -30,3 +30,11 @@ python3 -m uvicorn main:app --reload
 # Forzar commit a GITHUB
 ´´´
 git push -u origin main --force
+
+# Servidor de Inicio de Sesion
+Front 8080
+main_auth.py
+
+# Servidor de Clientes
+Frontend 8090 
+main.py

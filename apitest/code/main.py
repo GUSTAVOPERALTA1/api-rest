@@ -15,7 +15,6 @@ from fastapi import HTTPException, status
 from requests import post
 import hashlib
 import os
-from fastapi import *
 from fastapi.security import *
 import pyrebase
 
@@ -70,20 +69,32 @@ async def index():
     return{'message': 'API-REST'}
 
 #METODO GET
-@app.get("/clientes/{id_cliente}", response_model=Cliente)
-async def get_cliente(id_cliente: int):
-    with sqlite3.connect('sql/clientes.sqlite') as connection:
-        connection.row_factory= sqlite3.Row
-        cursor=connection.cursor()
-        cursor.execute("SELECT id_cliente,email,nombre FROM clientes where id_cliente = ?", (id_cliente,))
-        response=cursor.fetchone()
-        if response is None:
-            raise HTTPException(
-                status_code = status.HTTP_404_NOT_FOUND,
-                detail= "id_cliente no encontrado",
-                headers={"WWW-Authenticate": "Basic"},
-            )
-        return response
+@app.get("/clientes/{id_cliente}", response_model=Cliente,
+    summary ="Ver cliente con ID",
+    description = "Usa el ID del usuario para verlo a detalle",
+    status_code = status.HTTP_200_OK,
+    tags = ["auth"])
+async def get_cliente(id_cliente: int, credentials: HTTPAuthorizationCredentials= Depends(securityBearer)):
+    try:
+        auth = firebase.auth()
+        user = auth.get_account_info(credentials.credentials)
+        uid = user['users'][0]['localId']
+
+        with sqlite3.connect('sql/clientes.sqlite') as connection:
+            connection.row_factory= sqlite3.Row
+            cursor=connection.cursor()
+            cursor.execute("SELECT id_cliente,email,nombre FROM clientes where id_cliente = ?", (id_cliente,))
+            response=cursor.fetchone()
+            if response is None:
+                raise HTTPException(
+                    status_code = status.HTTP_404_NOT_FOUND,
+                    detail= "id_cliente no encontrado",
+                    headers={"WWW-Authenticate": "Basic"},
+                )
+            return response
+    except Exception as error:
+        print(f"Error: {error}")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
 @app.get("/clientes/", response_model=List[Cliente],
 status_code=status.HTTP_202_ACCEPTED,

@@ -10,13 +10,13 @@ function Login(){
     request.onload = () =>{
         const response = request.responseText;
         const status = request.status
-        const json = JSON.parse(request.responseText,response);
-        console.log("Response: " + response);
-        console.log("JSON: " + json);
+        const data = JSON.parse(response);
+        console.log(data.token);
 
         if (status == 202) {
-            alert("Bienvenid@, copia el siguiente TOKEN para realizar operaciones CRUD");
-            alert(response)
+            alert("Bienvenid@, este es tu token para realizar operaciones CRUD");
+            alert(data.token)
+            sessionStorage.setItem("id",data.token);
             window.location.replace("/get_list.html"); 
             
         }
