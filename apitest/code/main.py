@@ -15,8 +15,10 @@ from fastapi import HTTPException, status
 from requests import post
 import hashlib
 import os
+from fastapi import *
+from fastapi.security import *
+import pyrebase
 
-security = HTTPBasic()
 
 class Respuesta(BaseModel):
     message: str
@@ -33,8 +35,11 @@ class ClienteIN(BaseModel):
 
 app = FastAPI()
 
+securityBasic = HTTPBasic()
+securityBearer = HTTPBearer()
+
 origins = [  # Puertos Permitidos
-    "http://127.0.0.1:8080",
+    "http://127.0.0.1:8090",
     "http://127.0.0.1:8000",
     ]
 
@@ -45,24 +50,6 @@ app.add_middleware(
     allow_methods=["*"], # Metodos permitidos
     allow_headers=["*"],
 )
-
-def get_current_level(credentials: HTTPBasicCredentials = Depends(security)): # va a recibir el password y nos va a regresar el 0 o un 1 si no lo encuentra nos dira usuario no encontrado
-    password_b = hashlib.md5(credentials.password.encode())  #lo combierte MD5 y luego hace una consulta
-    password = password_b.hexdigest() #lo combierte a hexadecimal
-    with sqlite3.connect('sql/clientes.sqlite') as connection:
-        cursor = connection.cursor()
-        cursor.execute(
-            "SELECT level FROM usuarios WHERE username = ? and password = ?",
-            (credentials.username, password),
-        )
-        user = cursor.fetchone()
-        if not user:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect username or password",
-                headers={"WWW-Authenticate": "Basic"},
-            )
-    return user[0]
 
 
 @app.get('/', response_model=Respuesta)
@@ -89,20 +76,13 @@ async def get_cliente(id_cliente: int):
 status_code=status.HTTP_202_ACCEPTED,
 summary="Lista de clientes",
 description="Lista de clientes completa")
-async def clientes(level: int = Depends(get_current_level)):
-    if level == 0: 
-        with sqlite3.connect('sql/clientes.sqlite') as connection:
-            connection.row_factory = sqlite3.Row
-            cursor = connection.cursor()
-            cursor.execute('SELECT * FROM clientes')
-            response = cursor.fetchall()
-            return response
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Don't have permission to access this resource",
-            headers={"WWW-Authenticate": "Basic"},
-        )
+async def clientes():
+    with sqlite3.connect('sql/clientes.sqlite') as connection:
+        connection.row_factory = sqlite3.Row
+        cursor = connection.cursor()
+        cursor.execute('SELECT * FROM clientes')
+        response = cursor.fetchall()
+        return response
 
 #Metodo GET con limit y offset    
 @app.get('/clientes1/', response_model=List[Cliente])

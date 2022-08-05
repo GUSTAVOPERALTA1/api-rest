@@ -8,8 +8,7 @@ from typing import Union
 app = FastAPI()
 
 origins = [  # Puertos Permitidos
-    "http://127.0.0.1:8080",
-    "http://127.0.0.1:8000",
+    "*"
     ]
 
 app.add_middleware(
@@ -53,19 +52,18 @@ securityBearer = HTTPBearer()
          summary="Ver token del usuario",
          description="Ver token",
          tags=["auth"])
-def get_token(credentials: HTTPBasicCredentials = Depends(securityBasic)):
+async def get_token(credentials: HTTPBasicCredentials = Depends(securityBasic)):
     try:
         email = credentials.username
         password = credentials.password
         auth = firebase.auth()
         user = auth.sign_in_with_email_and_password(email, password)
         response = {
-            "token": user["idToken"]
+            "token": user["idToken"],
         }
         return response
     except Exception as error:
-        print(f"Error : {error}")
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        print(error)
 
 
 @app.get("/user/",
