@@ -1,10 +1,13 @@
 function getProductos(){
     var query = window.location.search.substring(1);
     console.log("Query: "+query)
+    var token = sessionStorage.getItem('id');
+    console.log(token)
 
     //Conectar Backend con Frontend
     var request = new XMLHttpRequest();
     request.open("GET","http://127.0.0.1:8000/clientes/",true);
+    request.setRequestHeader("Authorization", "Bearer " + token);
     request.setRequestHeader("Accept","application/json")
     request.onload = () =>{
         const response = request.responseText;

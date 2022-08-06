@@ -1,21 +1,12 @@
-from http.client import HTTPException
-from urllib import response
-from urllib.request import Request
-from lib2to3.pytree import Base
-from typing import Union
-from typing_extensions import Self
-from fastapi import FastAPI, Security
-import sqlite3
-from typing import List
+from fastapi import *
+from fastapi.security import *
 from pydantic import BaseModel
-from fastapi import Depends, HTTPException, status
+import pyrebase
 from fastapi.security import HTTPBasic, HTTPBasicCredentials 
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import HTTPException, status
-from requests import post
-import hashlib
-import os
-from fastapi.security import *
+from typing import Union
+import sqlite3
+from typing import List
 import pyrebase
 
 app = FastAPI()
@@ -32,7 +23,6 @@ app.add_middleware(
     allow_methods=["*"], # Metodos permitidos
     allow_headers=["*"],
 )
-
 
 class Respuesta(BaseModel):
     message: str
@@ -64,7 +54,8 @@ firebase = pyrebase.initialize_app(firebaseConfig)
 securityBasic = HTTPBasic()
 securityBearer = HTTPBearer()
 
-@app.get('/', response_model=Respuesta)
+@app.get('/', response_model=Respuesta,
+    tags=["get"])
 async def index():
     return{'message': 'API-REST'}
 
@@ -73,7 +64,7 @@ async def index():
     summary ="Ver cliente con ID",
     description = "Usa el ID del usuario para verlo a detalle",
     status_code = status.HTTP_200_OK,
-    tags = ["auth"])
+    tags = ["get"])
 async def get_cliente(id_cliente: int, credentials: HTTPAuthorizationCredentials= Depends(securityBearer)):
     try:
         auth = firebase.auth()
@@ -96,20 +87,32 @@ async def get_cliente(id_cliente: int, credentials: HTTPAuthorizationCredentials
         print(f"Error: {error}")
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
+# GET LISTA DE CLIENTES
 @app.get("/clientes/", response_model=List[Cliente],
 status_code=status.HTTP_202_ACCEPTED,
 summary="Lista de clientes",
-description="Lista de clientes completa")
-async def clientes():
-    with sqlite3.connect('sql/clientes.sqlite') as connection:
-        connection.row_factory = sqlite3.Row
-        cursor = connection.cursor()
-        cursor.execute('SELECT * FROM clientes')
-        response = cursor.fetchall()
-        return response
+description="Lista de clientes completa",
+tags = ["get"])
+async def clientes(credentials: HTTPAuthorizationCredentials= Depends(securityBearer)):
+    try:
+        auth = firebase.auth()
+        user = auth.get_account_info(credentials.credentials)
+        uid = user['users'][0]['localId']
+        
+        with sqlite3.connect('sql/clientes.sqlite') as connection:
+            connection.row_factory = sqlite3.Row
+            cursor = connection.cursor()
+            cursor.execute('SELECT * FROM clientes')
+            response = cursor.fetchall()
+            return response
+    except Exception as error:
+        print(f"Error: {error}")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
 
 #Metodo GET con limit y offset    
-@app.get('/clientes1/', response_model=List[Cliente])
+@app.get('/clientes1/', response_model=List[Cliente],
+    tags=["get"])
 async def get_clientes(offset:int=0,limit:int=11):
     with sqlite3.connect('sql/clientes.sqlite') as connection:
         connection.row_factory = sqlite3.Row
@@ -119,48 +122,78 @@ async def get_clientes(offset:int=0,limit:int=11):
         return response
 
 #METODO POST
-@app.post("/clientes/", response_model= Respuesta)
-async def post_clientes(cliente: ClienteIN):
-    with sqlite3.connect("sql/clientes.sqlite") as connection:
-        connection.row_factory = sqlite3.Row
-        cursor = connection.cursor()
-        cursor.execute(
-            "INSERT INTO clientes (nombre,email) VALUES (?,?)",
-            (cliente.nombre, cliente.email),
-        )
-        connection.commit()
-        return {"message":"Cliente agregado"}
+@app.post("/clientes/",response_model= Respuesta,
+    summary= "Actualizar cliente",
+    description= "Actualizar un cliente existente",
+    status_code = status.HTTP_202_ACCEPTED,
+    tags = ["post"])
+async def post_clientes(cliente: ClienteIN, credentials: HTTPAuthorizationCredentials= Depends(securityBearer)):
+    try:
+        auth = firebase.auth()
+        user = auth.get_account_info(credentials.credentials)
+        uid = user['users'][0]['localId']
+
+        with sqlite3.connect("sql/clientes.sqlite") as connection:
+            connection.row_factory = sqlite3.Row
+            cursor = connection.cursor()
+            cursor.execute(
+                "INSERT INTO clientes (nombre,email) VALUES (?,?)",
+                (cliente.nombre, cliente.email),)
+            connection.commit()
+            return {"message":"Cliente agregado"}
+    except Exception as error:
+        print(f"Error: {error}")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
 
 #METODO PUT
-@app.put("/clientes/", 
-response_model=Respuesta,
-status_code=status.HTTP_202_ACCEPTED,
-summary="Actualizar cliente",
-description="Actualizar un registro de cliente")
-async def update_cliente(cliente: Cliente):
-    with sqlite3.connect("sql/clientes.sqlite") as connection:
-        connection.row_factory = sqlite3.Row
-        cursor = connection.cursor()
-        cursor.execute("UPDATE clientes SET nombre =?, email= ? WHERE id_cliente =?;",
-        (cliente.nombre, cliente.email, cliente.id_cliente))
-        connection.commit()
-        response = {"message":"Cliente actualizado"}
-        return response
+@app.put("/clientes/", response_model=Respuesta,
+    status_code=status.HTTP_202_ACCEPTED,
+    summary="Actualizar cliente",
+    description="Actualizar un registro de cliente",
+    tags= ["put"])
+async def update_cliente(cliente: Cliente, credentials: HTTPAuthorizationCredentials= Depends(securityBearer)):
+    try:
+        auth = firebase.auth()
+        user = auth.get_account_info(credentials.credentials)
+        uid = user['users'][0]['localId']
+
+        with sqlite3.connect("sql/clientes.sqlite") as connection:
+            connection.row_factory = sqlite3.Row
+            cursor = connection.cursor()
+            cursor.execute("UPDATE clientes SET nombre =?, email= ? WHERE id_cliente =?;",
+            (cliente.nombre, cliente.email, cliente.id_cliente))
+            connection.commit()
+            response = {"message":"Cliente actualizado"}
+            return response
+    except Exception as error:
+        print(f"Error: {error}")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
 
 #METODO DELETE
-@app.delete("/clientes/", 
-response_model=Respuesta,
-status_code=status.HTTP_202_ACCEPTED,
-summary="Eliminar usuario",
-description="Eliminar usuario por ID")
-async def delete_cliente(id_cliente: int=0):
-    with sqlite3.connect('sql/clientes.sqlite') as connection:
-        connection.row_factory = sqlite3.Row
-        cursor=connection.cursor()
-        cursor.execute("DELETE FROM clientes WHERE id_cliente = '{id_cliente}';".format(id_cliente=id_cliente))
-        cursor.fetchall()
-        response = {"message":"Cliente eliminado"}
-        return response
+@app.delete("/clientes/", response_model=Respuesta,
+    status_code=status.HTTP_202_ACCEPTED,
+    summary="Eliminar usuario",
+    description="Eliminar usuario por ID",
+    tags=["delete"])
+async def delete_cliente(id_cliente: int=0, credentials: HTTPAuthorizationCredentials= Depends(securityBearer)):
+    try:
+        auth = firebase.auth()
+        user = auth.get_account_info(credentials.credentials)
+        uid = user['users'][0]['localId']
+
+        with sqlite3.connect('sql/clientes.sqlite') as connection:
+            connection.row_factory = sqlite3.Row
+            cursor=connection.cursor()
+            cursor.execute("DELETE FROM clientes WHERE id_cliente = '{id_cliente}';".format(id_cliente=id_cliente))
+            cursor.fetchall()
+            response = {"message":"Cliente eliminado"}
+            return response
+    except Exception as error:
+        print(f"Error: {error}")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
 
 @app.get("/user/validate/",
          status_code=status.HTTP_202_ACCEPTED,
@@ -207,7 +240,7 @@ async def get_user(credentials: HTTPAuthorizationCredentials = Depends(securityB
     status_code= status.HTTP_202_ACCEPTED,
     summary="Insertar usuario",
     description="Insertar usuarios dentro de Firebase Realtime",
-    tags=["add"])
+    tags=["post"])
 async def insert_user(post_user: Usuario):
     try: 
         email = post_user.email

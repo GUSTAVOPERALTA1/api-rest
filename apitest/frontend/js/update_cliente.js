@@ -1,11 +1,8 @@
 function putCliente(){
-
-    var request = new XMLHttpRequest();
     var id_cliente = window.location.search.substring(1);
     let id_clientecap = id_cliente;
     let nombre = document.getElementById("nombre");
     let email  = document.getElementById("email");
-
     let payload = {
         "id_cliente": id_clientecap,
         "nombre": nombre.value,
@@ -16,8 +13,11 @@ function putCliente(){
     console.log("nombre: " + nombre.value);
     console.log("email: "  + email.value);
     console.log(payload);
-    
+    var token = sessionStorage.getItem('id');
+    console.log(token)
+    var request = new XMLHttpRequest();
     request.open('PUT', "http://127.0.0.1:8000/clientes/",true);
+    request.setRequestHeader("Authorization", "Bearer " + token);
     request.setRequestHeader("Accept", "application/json");
     request.setRequestHeader("content-type", "application/json");
 

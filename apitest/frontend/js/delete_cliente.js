@@ -1,34 +1,30 @@
-function deleteCliente(){
-
+function deleteClientes(){
+    var query = window.location.search.substring(1);
+    var token = sessionStorage.getItem('id');
+    console.log(token)
+    console.log("id_cliente: " + query);
     var request = new XMLHttpRequest();
-    var id_cliente = window.location.search.substring(1);
-    console.log("id_cliente: " + id_cliente);
-    
-    request.open('DELETE', "http://127.0.0.1:8000/clientes/"+ id_cliente,true);
-    request.setRequestHeader("Accept", "application/json");
-    request.setRequestHeader("Authorization", "Basic " + btoa(usernombre + ":" + password))
-    request.setRequestHeader("content-type", "application/json");
+    request.open("DELETE","http://127.0.0.1:8000/clientes/?"+ query,true);
+    request.setRequestHeader("Authorization", "Bearer " + token);
+    request.setRequestHeader("Content-Type","application/json");
+    request.setRequestHeader("Accept","application/json");
 
-    
-    request.onload = () => {
-        
+
+    request.onload = () =>{
         const response = request.responseText;
-        const json = JSON.parse(response);     
+        const json = JSON.parse(response);
         const status = request.status;
-
-        if (request.status === 401 || request.status === 403) {
-            alert(json.detail);
-        }
-
-        else if (request.status == 202){
-
-            console.log("Response: " + response);
-            console.log("JSON: " + json);
-            console.log("Status: " + status);
-
+    
+        console.log("Response: " + response);
+        console.log("JSON: " + json);
+        console.log("Status: " + status);
+        
+        if(status == 202){
+            console.log("Eliminar")
             alert(json.message);
-            window.location.replace("get_list.html")
+            window.location.replace("/get_list.html");
         }
     };
     request.send();
-}
+};
+    
