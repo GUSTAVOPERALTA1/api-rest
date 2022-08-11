@@ -38,3 +38,6 @@ main_auth.py
 # Servidor de Clientes
 Frontend 8090 
 main.py
+
+# Matar un puerto
+fuser -k 8080/tcp

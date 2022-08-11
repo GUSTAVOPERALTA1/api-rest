@@ -1,7 +1,6 @@
 from fastapi import *
 from fastapi.security import *
 from pydantic import BaseModel
-import pyrebase
 from fastapi.security import HTTPBasic, HTTPBasicCredentials 
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Union
@@ -70,7 +69,7 @@ async def get_cliente(id_cliente: int, credentials: HTTPAuthorizationCredentials
         auth = firebase.auth()
         user = auth.get_account_info(credentials.credentials)
         uid = user['users'][0]['localId']
-
+    
         with sqlite3.connect('sql/clientes.sqlite') as connection:
             connection.row_factory= sqlite3.Row
             cursor=connection.cursor()
@@ -172,27 +171,26 @@ async def update_cliente(cliente: Cliente, credentials: HTTPAuthorizationCredent
 
 
 #METODO DELETE
-@app.delete("/clientes/", response_model=Respuesta,
-    status_code=status.HTTP_202_ACCEPTED,
-    summary="Eliminar usuario",
-    description="Eliminar usuario por ID",
-    tags=["delete"])
-async def delete_cliente(id_cliente: int=0, credentials: HTTPAuthorizationCredentials= Depends(securityBearer)):
+@app.delete("/clientes/", response_model=Respuesta,status_code=status.HTTP_202_ACCEPTED,
+summary="ELIMINACION DE USUARIOS",description="ELIMINACION DE USUARIOS")
+async def clientes_delete(credentials: HTTPAuthorizationCredentials = Depends(securityBearer), id_cliente: int=0):
     try:
         auth = firebase.auth()
         user = auth.get_account_info(credentials.credentials)
-        uid = user['users'][0]['localId']
+        uid = user['users'][0]['localId'] 
 
         with sqlite3.connect('sql/clientes.sqlite') as connection:
             connection.row_factory = sqlite3.Row
             cursor=connection.cursor()
             cursor.execute("DELETE FROM clientes WHERE id_cliente = '{id_cliente}';".format(id_cliente=id_cliente))
             cursor.fetchall()
-            response = {"message":"Cliente eliminado"}
+            response = {"message":"Cliente Eliminado"}
             return response
+        
     except Exception as error:
         print(f"Error: {error}")
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)    
+
 
 
 @app.get("/user/validate/",
